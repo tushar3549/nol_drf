@@ -15,3 +15,4 @@ class RoomsForDatesView(APIView):
             return Response({'detail':'check_in & check_out required (YYYY-MM-DD)'}, status=400)
         room_types=RoomType.objects.filter(property_id=pk).prefetch_related('rate_plans')
         return Response(RoomTypeSerializer(room_types, many=True).data)
+    
