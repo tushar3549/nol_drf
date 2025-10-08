@@ -1,1 +1,1 @@
-# NOL Booking API — Django (SQLite)\nSee instructions in the chat.\n
+# NOL Booking API — Django (SQLite)\nAccording to the pptx\n
