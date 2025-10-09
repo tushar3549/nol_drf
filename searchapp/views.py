@@ -1,4 +1,3 @@
-
 from decimal import Decimal
 from django.db.models import Q, Min
 from rest_framework.views import APIView
@@ -47,26 +46,26 @@ class SearchView(APIView):
             except Exception:
                 pass
 
-        # filters
+        # filters (all from RatePlan fields)
         if request.query_params.get('breakfast') == '1':
             qs = qs.filter(room_types__rate_plans__breakfast_included=True)
 
         if request.query_params.get('free_cancellation') == '1':
             qs = qs.filter(room_types__rate_plans__free_cancellation=True)
 
-        # Wi-Fi usually comes from amenities M2M
         if request.query_params.get('free_wifi') == '1':
-            qs = qs.filter(amenities__code='free_wifi')
+            qs = qs.filter(room_types__rate_plans__free_wifi=True)
 
+        # price range → RatePlan.nightly_price
         pmin = request.query_params.get('price_min')
         pmax = request.query_params.get('price_max')
         if pmin:
-            qs = qs.filter(room_types__rate_plans__base_price__gte=Decimal(pmin))
+            qs = qs.filter(room_types__rate_plans__nightly_price__gte=Decimal(pmin))
         if pmax:
-            qs = qs.filter(room_types__rate_plans__base_price__lte=Decimal(pmax))
+            qs = qs.filter(room_types__rate_plans__nightly_price__lte=Decimal(pmax))
 
-        # use min(rate_plan.price) for sorting/cards
-        qs = qs.annotate(min_price=Min('room_types__rate_plans__base_price')).distinct()
+        # use min(rate_plans.nightly_price) for cards/sorting
+        qs = qs.annotate(min_price=Min('room_types__rate_plans__nightly_price')).distinct()
 
         sort = request.query_params.get('sort', 'recommended')
         if sort == 'price_asc':
@@ -97,7 +96,7 @@ class MapView(APIView):
         qs = (Property.objects
               .filter(lat__gte=min(lat1, lat2), lat__lte=max(lat1, lat2),
                       lng__gte=min(lng1, lng2), lng__lte=max(lng1, lng2))
-              .annotate(min_price=Min('room_types__rate_plans__base_price'))
+              .annotate(min_price=Min('room_types__rate_plans__nightly_price'))
               .values('id', 'lat', 'lng', 'min_price')[:200])
 
         items = [{
@@ -107,9 +106,6 @@ class MapView(APIView):
             'label_price': str(r['min_price'] or 0),
         } for r in qs]
         return Response({'items': items})
-
-
-
 
 
 
