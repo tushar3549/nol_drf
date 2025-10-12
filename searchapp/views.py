@@ -12,7 +12,7 @@ def _recommended_queryset():
 class HomeView(APIView):
     permission_classes = [permissions.AllowAny]
     def get(self, request, version):
-        banners = [{'image_url': 'https://picsum.photos/1200/400', 'title': 'Welcome to NOL', 'link': '#'}]
+        banners = [{'image_url': 'https://yaimg.yanolja.com/web/images/display-site/home/img_nol_brand_pc_default.svg', 'title': 'Welcome to NOL', 'link': '#'}]
         recommended = _recommended_queryset()[:10]
         return Response({
             'navbar': {'logo': 'NOL', 'has_search': True},
