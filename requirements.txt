@@ -5,3 +5,4 @@ djangorestframework-simplejwt
 python-dotenv
 django-cors-headers
 drf-yasg
+whitenoise>=6.6.0
